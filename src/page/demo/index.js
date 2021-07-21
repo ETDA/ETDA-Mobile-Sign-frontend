@@ -1103,7 +1103,7 @@ export default function CustomizedSteppers() {
 
               {timeCount === 0 ? (
                 <Countdown
-                  date={Date.now() + process.env.REACT_APP_TIME}
+                  date={Date.now() + 180000}
                   renderer={renderer}
                 />
               ) : (
