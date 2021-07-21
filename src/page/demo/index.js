@@ -1102,7 +1102,10 @@ export default function CustomizedSteppers() {
               <br />
 
               {timeCount === 0 ? (
-                <Countdown date={Date.now() + 60000} renderer={renderer} />
+                <Countdown
+                  date={Date.now() + process.env.REACT_APP_TIME}
+                  renderer={renderer}
+                />
               ) : (
                 // eslint-disable-next-line jsx-a11y/alt-text
                 ""
