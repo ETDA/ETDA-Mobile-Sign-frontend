@@ -1138,7 +1138,7 @@ export default function CustomizedSteppers() {
                 <img src={dataFile.qrcode} />
               )}
               <br />
-              {!isMobile ? (
+              {isMobile ? (
                 <Button
                   color="primary"
                   onClick={deeplink}
