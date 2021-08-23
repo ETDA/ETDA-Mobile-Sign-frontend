@@ -31,6 +31,7 @@ import {
   faFileCode,
   faListAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import { isMobile } from "react-device-detect";
 
 import StepConnector from "@material-ui/core/StepConnector";
 import Typography from "@material-ui/core/Typography";
@@ -268,7 +269,7 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   fixWidth: {
-    minWidth: "600px",
+    // minWidth: "600px",
   },
   textW: {
     color: "#ffffff",
@@ -331,6 +332,9 @@ export default function CustomizedSteppers() {
     requestToken: "",
     signedDocument: "",
   });
+
+  const [qrData, setQrData] = React.useState("");
+
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);
@@ -427,10 +431,12 @@ export default function CustomizedSteppers() {
               qr.decodeFromImage(response.data.qrcode).then((res) => {
                 console.log("data", res);
                 console.log("qr", res.data);
+                setQrData(res.data);
                 var dataSp = res.data.split(";");
                 console.log("dataSp 1", dataSp[1]);
                 console.log("dataSp 2", dataSp[2]);
                 console.log("dataSp 3", dataSp[3]);
+
                 rqid = dataSp[1];
 
                 setDataFile({
@@ -667,6 +673,17 @@ export default function CustomizedSteppers() {
   const handleReset = () => {
     window.location.reload();
   };
+
+  const deeplink = () => {
+    // window.location.reload();
+    var encodedString = btoa(qrData);
+    console.log("mobilesign://qrcode/" + encodedString); // Outputs: "SGVsbG8gV29ybGQh"
+    // Decode the String
+    // var decodedString = atob(encodedString);
+    // console.log(decodedString); // Outputs: "Hello World!"
+    window.open("mobilesign://qrcode/" + encodedString, "_blank");
+  };
+
   const handleChange = (e) => {
     setSelectedValue(e.value);
   };
@@ -773,6 +790,11 @@ export default function CustomizedSteppers() {
 
   React.useEffect(() => {
     console.log("useEffect", dataFile);
+    if (isMobile) {
+      console.log("This content is unavailable on mobile");
+    } else {
+      console.log("not mobile");
+    }
   }, [dataFile]);
 
   return (
@@ -1102,10 +1124,7 @@ export default function CustomizedSteppers() {
               <br />
 
               {timeCount === 0 ? (
-                <Countdown
-                  date={Date.now() + 180000}
-                  renderer={renderer}
-                />
+                <Countdown date={Date.now() + 180000} renderer={renderer} />
               ) : (
                 // eslint-disable-next-line jsx-a11y/alt-text
                 ""
@@ -1117,6 +1136,20 @@ export default function CustomizedSteppers() {
               ) : (
                 // eslint-disable-next-line jsx-a11y/alt-text
                 <img src={dataFile.qrcode} />
+              )}
+              <br />
+              {!isMobile ? (
+                <Button
+                  color="primary"
+                  onClick={deeplink}
+                  variant="contained"
+                  className={classes.button}
+                >
+                  Sign with ETDA Sign
+                </Button>
+              ) : (
+                // eslint-disable-next-line jsx-a11y/alt-text
+                ""
               )}
             </Typography>
             <br />
