@@ -732,7 +732,7 @@ export default function CustomizedSteppers() {
     var b64 = dataFile.base64;
     var bin = atob(b64);
     console.log("File Size:", Math.round(bin.length / 1024), "KB");
-    console.log("PDF Version:", bin.match(/^.PDF-([0-9.]+)/)[1]);
+    // console.log("PDF Version:", bin.match(/^.PDF-([0-9.]+)/)[1]);
     // Insert a link that allows the user to download the PDF file
     var link = document.createElement("a");
     link.innerHTML = "Download PDF file";
