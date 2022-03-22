@@ -29,7 +29,8 @@ function start_signingserver() {
 
   echo "=> Starting RUN Document Server"
   
-  yarn run start
+  #yarn run start
+  npm run build
   
   echo "=> RUN Document Server SUCCESS"
 }
