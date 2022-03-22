@@ -2,5 +2,5 @@
 FROM node:12-alpine
 RUN apk update && apk upgrade && apk add --no-cache bash git openssh
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
+#ENV PATH /app/node_modules/.bin:$PATH
 COPY . /app
