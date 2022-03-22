@@ -1,0 +1,77 @@
+{
+  "name": "work",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "/tedasign",
+  "dependencies": {
+    "@date-io/date-fns": "^2.10.8",
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
+    "@material-ui/pickers": "^3.3.10",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "antd": "^4.14.0",
+    "axios": "^0.21.1",
+    "base64topdf": "^1.1.8",
+    "downloadjs": "^1.4.7",
+    "env-cmd": "^10.1.0",
+    "express": "4.17.1",
+    "file-saver": "^2.0.5",
+    "formik": "^2.2.6",
+    "formik-material-ui": "^3.0.1",
+    "formik-stepper": "^0.0.1",
+    "js-file-download": "^0.4.12",
+    "nodemon": "2.0.3",
+    "pusher-js": "^7.0.3",
+    "qrcode-decoder": "^0.1.3",
+    "qrcode-reader": "^1.0.4",
+    "react": "^17.0.1",
+    "react-base64-downloader": "^2.1.7",
+    "react-bootstrap-icons": "^1.4.0",
+    "react-countdown": "^2.3.2",
+    "react-device-detect": "^1.17.0",
+    "react-dom": "^17.0.1",
+    "react-dropzone": "^11.3.2",
+    "react-dropzone-uploader": "^2.11.0",
+    "react-formik-step": "^0.1.0",
+    "react-qr-code": "^1.1.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3",
+    "react-select": "^4.2.1",
+    "simple-react-dropzone": "^0.1.20",
+    "sweetalert": "^2.1.2",
+    "web-vitals": "^1.0.1",
+    "yup": "^0.32.9"
+  },
+  "scripts": {
+    "start": "env-cmd -f .env react-scripts start",
+    "build": "env-cmd -f .env.production react-scripts build",
+    "start-js": "react-scripts start",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "startteest": "nodemon server.js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

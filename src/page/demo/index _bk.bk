@@ -1,0 +1,916 @@
+import React, { useCallback } from "react";
+import PropTypes from "prop-types";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
+import clsx from "clsx";
+import Stepper from "@material-ui/core/Stepper";
+import Step from "@material-ui/core/Step";
+import StepLabel from "@material-ui/core/StepLabel";
+import Check from "@material-ui/icons/Check";
+import SettingsIcon from "@material-ui/icons/Settings";
+import GroupAddIcon from "@material-ui/icons/GroupAdd";
+import VideoLabelIcon from "@material-ui/icons/VideoLabel";
+import DescriptionIcon from "@material-ui/icons/VideoLabel";
+import * as Icon from "react-bootstrap-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Select from "react-select";
+import PictureAsPdfIcon from "@material-ui/icons/PictureAsPdf";
+import QRCode from "react-qr-code";
+import {
+  Box,
+  Container,
+  Grid,
+  Paper,
+  Button,
+  CardContent,
+  CardActions,
+  Link,
+} from "@material-ui/core";
+
+import {
+  faIdCard,
+  faFilePdf,
+  faFileSignature,
+} from "@fortawesome/free-solid-svg-icons";
+
+import StepConnector from "@material-ui/core/StepConnector";
+import Typography from "@material-ui/core/Typography";
+import { useDropzone } from "react-dropzone";
+
+import "react-dropzone-uploader/dist/styles.css";
+import "./demo.css";
+import axios from "axios";
+
+const options = [
+  { value: "อาศิส อัญญะโพธิ์ 1", label: "อาศิส อัญญะโพธิ์" },
+  { value: "อาศิส อัญญะโพธิ์ 2", label: "อาศิส อัญญะโพธิ์" },
+  { value: "อาศิส อัญญะโพธิ์ 3", label: "อาศิส อัญญะโพธิ์" },
+  { value: "อาศิส อัญญะโพธิ์ 4", label: "อาศิส อัญญะโพธิ์" },
+];
+
+const QontoConnector = withStyles({
+  alternativeLabel: {
+    top: 10,
+    left: "calc(-50% + 16px)",
+    right: "calc(50% + 16px)",
+  },
+  active: {
+    "& $line": {
+      borderColor: "#784af4",
+    },
+  },
+  completed: {
+    "& $line": {
+      borderColor: "#784af4",
+    },
+  },
+  line: {
+    borderColor: "#eaeaf0",
+    borderTopWidth: 3,
+    borderRadius: 1,
+  },
+})(StepConnector);
+
+const useQontoStepIconStyles = makeStyles({
+  root: {
+    color: "#eaeaf0",
+    display: "flex",
+    height: 22,
+    alignItems: "center",
+  },
+  active: {
+    color: "#784af4",
+  },
+  circle: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    backgroundColor: "currentColor",
+  },
+  completed: {
+    color: "#784af4",
+    zIndex: 1,
+    fontSize: 18,
+  },
+});
+
+function QontoStepIcon(props) {
+  const classes = useQontoStepIconStyles();
+  const { active, completed } = props;
+
+  return (
+    <div
+      className={clsx(classes.root, {
+        [classes.active]: active,
+      })}
+    >
+      {completed ? (
+        <Check className={classes.completed} />
+      ) : (
+        <div className={classes.circle} />
+      )}
+    </div>
+  );
+}
+
+QontoStepIcon.propTypes = {
+  /**
+   * Whether this step is active.
+   */
+  active: PropTypes.bool,
+  /**
+   * Mark the step as completed. Is passed to child components.
+   */
+  completed: PropTypes.bool,
+};
+
+const ColorlibConnector = withStyles({
+  alternativeLabel: {
+    top: 22,
+  },
+  active: {
+    "& $line": {
+      backgroundColor: "#rgba(0, 0, 0, 0.87)",
+    },
+  },
+  completed: {
+    "& $line": {
+      backgroundColor: "#3f51b5",
+    },
+  },
+  line: {
+    height: 3,
+    border: 0,
+    backgroundColor: "#eaeaf0",
+    borderRadius: 1,
+  },
+})(StepConnector);
+// const useStyles = makeStyles((theme) => ({
+
+const useColorlibStepIconStyles = makeStyles((theme) => ({
+  root: {
+    backgroundColor: "#ccc",
+    zIndex: 1,
+    color: "#fff",
+    width: 50,
+    height: 50,
+    display: "flex",
+    borderRadius: "50%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  active: {
+    backgroundColor: "#rgba(0, 0, 0, 0.87)",
+    // backgroundImage:
+    //   "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
+    // boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
+  },
+  completed: {
+    backgroundColor: "#3f51b5",
+    // backgroundImage:
+    //   "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
+  },
+}));
+
+function ColorlibStepIcon(props) {
+  const classes = useColorlibStepIconStyles();
+  const { active, completed } = props;
+
+  const icons = {
+    1: <Icon.FileEarmarkText />,
+    2: <FontAwesomeIcon icon={faIdCard} />,
+    3: <FontAwesomeIcon icon={faFilePdf} />,
+    4: <FontAwesomeIcon icon={faFileSignature} />,
+  };
+
+  return (
+    <div
+      className={clsx(classes.root, {
+        [classes.active]: active,
+        [classes.completed]: completed,
+      })}
+    >
+      {icons[String(props.icon)]}
+    </div>
+  );
+}
+
+ColorlibStepIcon.propTypes = {
+  /**
+   * Whether this step is active.
+   */
+  active: PropTypes.bool,
+  /**
+   * Mark the step as completed. Is passed to child components.
+   */
+  completed: PropTypes.bool,
+  /**
+   * The label displayed in the step icon.
+   */
+  icon: PropTypes.node,
+};
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "100%",
+  },
+  button: {
+    marginRight: theme.spacing(1),
+  },
+  instructions: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  paper: {
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(3),
+    padding: theme.spacing(2),
+    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
+      marginTop: theme.spacing(6),
+      marginBottom: theme.spacing(6),
+      padding: theme.spacing(3),
+    },
+  },
+  layout: {
+    width: "auto",
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
+      width: 800,
+      marginLeft: "auto",
+      marginRight: "auto",
+    },
+  },
+  test: {
+    flex: "1",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "20px",
+    borderWidth: "2px",
+    borderRadius: "2px",
+    borderColor: "#eeeeee",
+    borderStyle: "dashed",
+    backgroundColor: "#fafafa",
+    color: "#bdbdbd",
+    outline: "none",
+    transition: "border .24s ease-in-out",
+  },
+}));
+
+const useStyless = makeStyles((theme) => ({
+  root: {
+    width: "100%",
+  },
+  button: {
+    marginRight: theme.spacing(1),
+  },
+  instructions: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  paper: {
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(3),
+    padding: theme.spacing(2),
+    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
+      marginTop: theme.spacing(6),
+      marginBottom: theme.spacing(6),
+      padding: theme.spacing(3),
+    },
+  },
+  layout: {
+    width: "auto",
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
+      width: 800,
+      marginLeft: "auto",
+      marginRight: "auto",
+    },
+  },
+
+  test: {
+    flex: "1",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "20px",
+    borderWidth: "2px",
+    borderRadius: "2px",
+    borderColor: "#eeeeee",
+    borderStyle: "dashed",
+    backgroundColor: "#fafafa",
+    color: "#bdbdbd",
+    outline: "none",
+    transition: "border .24s ease-in-out",
+  },
+}));
+
+function getSteps() {
+  return ["อัปโหลด", "เอกสารลงนาม"];
+}
+
+function getStepContent(step) {
+  switch (step) {
+    case 0:
+      return step1();
+    case 1:
+      return "What is an ad group anyways?";
+    case 2:
+      return "This is the bit I really care about!";
+    case 3:
+      return "This is the bit I really care about!";
+    default:
+      return "Unknown step";
+  }
+}
+
+export function step1() {
+  return "s";
+}
+export default function CustomizedSteppers() {
+  const classes = useStyles();
+  const [activeStep, setActiveStep] = React.useState(1);
+  const [activeQr, setActiveQr] = React.useState(0);
+  const [activeNext1, setActiveNext1] = React.useState(0);
+  const [openNext1, setOpenNext1] = React.useState(0);
+
+  const [dataFile, setDataFile] = React.useState({
+    _id: "",
+    name: "",
+    file: "",
+    userId: "",
+    ext: "",
+    createdAt: "",
+    qrcode: "",
+    refNumber: "",
+    requestId: "",
+    requestToken: "",
+    signedDocument: "",
+  });
+  const steps = getSteps();
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+  const handleNextStep1 = () => {
+    let formData = new FormData();
+    acceptedFiles.forEach((file) => {
+      console.log(file);
+      formData.append("doc", file, file.name);
+      console.log(formData);
+    });
+    console.log(formData);
+
+    var config = {
+      method: "post",
+      url: "http://localhost:3080y/api/api/document",
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      data: formData,
+    };
+
+    axios(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data));
+        console.log("response.data", response.data.data);
+        const dataFiles = {
+          _id: response.data.data._id,
+          name: response.data.data.name,
+          file: response.data.data.file,
+          userId: response.data.data.userId,
+          ext: response.data.data.ext,
+          createdAt: response.data.data.createdAt,
+        };
+        setDataFile(dataFiles);
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        // handleNextStep2();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const handleNextStep2 = () => {
+    var config = {
+      method: "post",
+      url:
+        "http://localhost:3080/api/api/document/signing_request/" +
+        dataFile._id,
+    };
+    axios(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data));
+        console.log("signing_request", response.data.data);
+
+        const dataFiles = {
+          _id: response.data.data._id,
+          name: response.data.data.name,
+          file: response.data.data.file,
+          userId: response.data.data.userId,
+          ext: response.data.data.ext,
+          createdAt: response.data.data.createdAt,
+          qrcode: response.data.data.qrcode,
+          refNumber: response.data.data.refNumber,
+          requestId: response.data.data.requestId,
+          requestToken: response.data.data.requestToken,
+        };
+        console.log("signing_request dataFiles", dataFiles);
+
+        setDataFile({
+          ...dataFiles,
+        });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const handleNextStep3 = () => {};
+
+  const handleNextStep4 = () => {};
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleReset = () => {
+    window.location.reload();
+  };
+
+  const getUploadParams = async ({ file, meta: { name } }) => {
+    console.log("getUploadParams", file);
+    console.log("getUploadParams", name);
+
+    // const url = "https://httpbin.org/post";
+    // return {
+    //   url,
+    //   meta: { fileUrl: `${url}/${encodeURIComponent(meta.name)}` },
+    // };
+  };
+
+  const handleChangeStatus = ({ meta }, status) => {
+    console.log("handleChangeStatus", meta);
+    console.log(status, meta);
+  };
+
+  const handleSubmit = (files, allFiles) => {
+    console.log(files.map((f) => f.meta));
+    allFiles.forEach((f) => f.remove());
+  };
+
+  const dropzoneRef = React.createRef();
+
+  const onDrop = useCallback((acceptedFiles) => {
+    console.log("handleChangeStatus", acceptedFiles);
+    if (acceptedFiles.length > 0) {
+      setOpenNext1(1);
+    }
+    // Do something with the files
+  }, []);
+
+  const {
+    getRootProps,
+    getInputProps,
+    acceptedFiles,
+    isDragActive,
+    isDragAccept,
+    isDragReject,
+  } = useDropzone({
+    noKeyboard: true,
+    accept: ".pdf",
+    maxFiles: 1,
+    onDrop,
+  });
+
+  const files = acceptedFiles.map((file) => (
+    <li key={file.path}>{file.path}</li>
+  ));
+
+  const getColor = (props) => {
+    if (props.isDragAccept) {
+      return "#00e676";
+    }
+    if (props.isDragReject) {
+      return "#ff1744";
+    }
+    if (props.isDragActive) {
+      return "#2196f3";
+    }
+    return "#eeeeee";
+  };
+
+  // const req = request.post("/upload");
+  // acceptedFiles.forEach((file) => {
+  //   req.attach(file.name, file);
+  // });
+  // req.end(callback);
+
+  // React.useEffect(() => {
+  //   if (dataFile._id != "") {
+  //     console.log("useEffect", dataFile);
+  //   }
+  // }, [dataFile._id]);
+
+  return (
+    <React.Fragment>
+      <main className={classes.layout}>
+        <Paper className={classes.paper}>
+          <div className={classes.root}>
+            <h2> ขั้นตอนการลงลายมือชื่ออิเล็กทรอนิกส์</h2>
+            <Stepper
+              alternativeLabel
+              activeStep={activeStep}
+              connector={<ColorlibConnector />}
+            >
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel StepIconComponent={ColorlibStepIcon}>
+                    {label}
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+            <div>
+              {activeStep === steps.length ? (
+                <div>
+                  <Paper className={classes.paper}>
+                    <h4> ลงลายมือชื่ออิเล็กทรอนิกส์</h4>
+                    <CardContent>
+                      <Typography
+                        className={classes.title}
+                        gutterBottom
+                        color="textSecondary"
+                      >
+                        Document ID: {dataFile._id}
+                      </Typography>
+                      <br />
+                      <Typography
+                        className={classes.title}
+                        color="textSecondary"
+                        gutterBottom
+                      >
+                        ชื่อเอกสาร: {dataFile.name}
+                      </Typography>
+                      <br />
+                      <Typography
+                        className={classes.title}
+                        color="textSecondary"
+                        gutterBottom
+                      >
+                        Extension: {dataFile.ext}
+                      </Typography>
+                      <br />
+                      <Typography
+                        className={classes.title}
+                        color="textSecondary"
+                        gutterBottom
+                      >
+                        Request ID: {dataFile.requestId}
+                      </Typography>
+                      <br />
+                      <Typography
+                        className={classes.title}
+                        color="textSecondary"
+                        gutterBottom
+                      >
+                        Reference Number: {dataFile.name}
+                      </Typography>
+                      <br />
+                      <Typography
+                        className={classes.title}
+                        color="textSecondary"
+                        gutterBottom
+                      >
+                        QRCode: <br />
+                        {dataFile.qrcode === undefined ? (
+                          ""
+                        ) : (
+                          <img src={dataFile.qrcode} />
+                        )}
+                      </Typography>
+                      <br />
+
+                      <Typography
+                        className={classes.title}
+                        color="textSecondary"
+                        gutterBottom
+                      >
+                        Original Document: {dataFile.file}
+                        <br />
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <PictureAsPdfIcon />
+                          <span>
+                            {" "}
+                            <a target="_blank" href={dataFile.file}>
+                              {" "}
+                              Original Document
+                            </a>
+                          </span>
+                        </div>
+                      </Typography>
+                      <br />
+                      <Typography
+                        className={classes.title}
+                        color="textSecondary"
+                        gutterBottom
+                      >
+                        Signed Document :{dataFile.signedDocument}
+                        <br />
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <PictureAsPdfIcon />
+                          <span>
+                            {" "}
+                            <a target="_blank" href="">
+                              {" "}
+                              Signed Document
+                            </a>
+                          </span>
+                        </div>
+                      </Typography>
+                    </CardContent>
+                    <hr />
+                    <CardActions>
+                      <Button onClick={handleReset} className={classes.button}>
+                        ยกเลิก
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNextStep2}
+                        className={classes.button}
+                      >
+                        Signing Request
+                      </Button>
+                    </CardActions>
+                  </Paper>
+                </div>
+              ) : (
+                <div>
+                  <Typography className={classes.instructions}>
+                    {activeStep === 1 ? (
+                      <Paper className={classes.paper}>
+                        <h4>
+                          ตัวอย่างแบบฟอร์มเพื่ออัปโหลดเอกสาร : ขั้นตอนที่ 1 - 4
+                        </h4>
+                        <div className={classes.test}>
+                          <Container
+                            {...getRootProps({
+                              isDragActive,
+                              isDragAccept,
+                              isDragReject,
+                              acceptedFiles,
+                            })}
+                          >
+                            <input {...getInputProps()} />
+                            {isDragAccept && <p>All files will be accepted</p>}
+                            {isDragReject && <p>Some files will be rejected</p>}
+                            {!isDragActive && <p>Drop some files here ...</p>}
+                            <aside>
+                              <h4>Files</h4>
+                              <ul>{files}</ul>
+                            </aside>
+                          </Container>
+                        </div>
+                      </Paper>
+                    ) : null}
+                    {activeStep === 2 ? (
+                      <Paper className={classes.paper}>
+                        <h4>
+                          เลือกรูปแบบการลงลายมือชื่ออิเล็กทรอนิกส์ : ขั้นตอนที่
+                          2 - 4
+                        </h4>
+                        <Grid container spacing={1}>
+                          <Grid
+                            style={{
+                              borderLeft: "1px solid #dee2e6 !important",
+                            }}
+                            item
+                            md={6}
+                            xs={12}
+                            className={classes.item_list}
+                          >
+                            <CardContent>
+                              <Typography
+                                className={classes.title}
+                                secondary
+                                gutterBottom
+                                variant="h6"
+                              >
+                                ในนามองค์กรโดย
+                              </Typography>
+                              <br />
+                              <Typography
+                                className={classes.title}
+                                color="textSecondary"
+                                gutterBottom
+                              >
+                                สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน)
+                              </Typography>
+                              <br />
+                              <Typography variant="body1">
+                                ผู้ดำเนินการ สุพัชรินทร์ กิ่งแก้ว
+                              </Typography>
+                            </CardContent>
+                            <hr />
+                            <CardActions>
+                              <Box style={{ textAlign: "center" }}>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  size="medium"
+                                  onClick={handleNext}
+                                >
+                                  ลงลายมือชื่อ
+                                </Button>
+                              </Box>
+                            </CardActions>
+                          </Grid>
+                          <Grid
+                            item
+                            md={6}
+                            xs={12}
+                            className={classes.item_list}
+                          >
+                            <CardContent>
+                              <Typography
+                                className={classes.title}
+                                gutterBottom
+                                variant="h6"
+                              >
+                                ในนามบุคคลโดย
+                              </Typography>
+                              <br />
+                              <Typography
+                                className={classes.title}
+                                color="textSecondary"
+                                gutterBottom
+                              >
+                                เลขบัตรประชาชน
+                                <Select options={options} />
+                              </Typography>
+                              <br />
+                              <Typography variant="body1">
+                                รูปภาพลายเซ็น
+                              </Typography>
+                              <Box style={{ textAlign: "center" }}>sss</Box>
+                            </CardContent>
+                            <hr />
+                            <CardActions>
+                              <Box style={{ textAlign: "center" }}>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  size="medium"
+                                  onClick={handleNext}
+                                >
+                                  ลงลายมือชื่อ
+                                </Button>
+                              </Box>
+                            </CardActions>
+                          </Grid>
+                        </Grid>
+                      </Paper>
+                    ) : null}
+                    {activeStep === 3 ? (
+                      <Paper className={classes.paper}>
+                        <h4> เอกสารตามมาตรฐาน PDF/A-3: : ขั้นตอนที่ 3 - 4</h4>
+                        <CardContent>
+                          <Typography
+                            className={classes.title}
+                            gutterBottom
+                            variant="body1"
+                          >
+                            กรุณาตรวจสอบข้อมูลในเอกสารก่อนลงลายมือชื่ออิเล็กทรอนิกส์
+                          </Typography>
+                          <br />
+                          <Typography
+                            className={classes.title}
+                            color="textSecondary"
+                            gutterBottom
+                          >
+                            <Link
+                              component="button"
+                              variant="body2"
+                              onClick={() => {
+                                console.info("I'm a button.");
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                <PictureAsPdfIcon />
+                                <span>
+                                  {" "}
+                                  <a target="_blank" href={dataFile.file}>
+                                    {" "}
+                                    {dataFile.file}{" "}
+                                  </a>
+                                </span>
+                              </div>
+                            </Link>
+                          </Typography>
+                          <br />
+                        </CardContent>
+                      </Paper>
+                    ) : null}
+                    {activeStep === 4 ? (
+                      <Paper className={classes.paper}>
+                        <h4> ลงลายมือชื่ออิเล็กทรอนิกส์</h4>
+                        <CardContent>
+                          <Typography
+                            className={classes.title}
+                            gutterBottom
+                            color="textSecondary"
+                          >
+                            QRCode:
+                            <QRCode value="hey" />
+                          </Typography>
+                          <br />
+                          <Typography
+                            className={classes.title}
+                            gutterBottom
+                            color="textSecondary"
+                          >
+                            Document ID: aded6ec9-d8f2-4f95-b742-dd10050e5831
+                          </Typography>
+                          <br />
+
+                          <Typography
+                            className={classes.title}
+                            color="textSecondary"
+                            gutterBottom
+                          >
+                            ชื่อเอกสาร: ทดสอบเพิ่ม
+                          </Typography>
+                          <br />
+                        </CardContent>
+                      </Paper>
+                    ) : null}
+                  </Typography>
+                  <Typography align="right" style={{ textAlign: "rignt" }}>
+                    {/* <Button
+                      disabled={activeStep <= 1}
+                      onClick={handleBack}
+                      className={classes.button}
+                    >
+                      Backalign
+                    </Button> */}
+                    {activeStep === 1 ? (
+                      openNext1 === 0 ? (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          disabled={true}
+                          className={classes.button}
+                        >
+                          {activeStep === steps.length ? "Finish" : "ถัดไป"}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleNextStep1}
+                          className={classes.button}
+                        >
+                          {activeStep === steps.length ? "Finish" : "ถัดไป"}
+                        </Button>
+                      )
+                    ) : null}
+                    {activeStep === 3 ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNext}
+                        className={classes.button}
+                      >
+                        {activeStep === steps.length ? "Finish" : "ถัดไป"}
+                      </Button>
+                    ) : null}
+                  </Typography>
+                </div>
+              )}
+            </div>
+          </div>
+        </Paper>
+      </main>
+    </React.Fragment>
+  );
+}
